@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // Logo asset (swap the path to your hosted file if needed)
 // In production, keep the logo under /public
-const ZAIN_LOGO_URL = "/zain-logo.png";
+const ZAIN_LOGO_URL = "/ZainLogo (1).png";
 
 // --- Type Definitions ---
 type Job = {
