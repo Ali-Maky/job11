@@ -680,7 +680,7 @@ function JobModal({ job, onClose, onSubmitted }: JobModalProps) {
               <label className="mb-2 mt-1 block text-sm font-medium">Phone</label>
               <input
                 className="mb-3 w-full rounded-xl border border-gray-200 px-3 py-2 focus:border-purple-500 focus:outline-none"
-                value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+964 …"
+                value={phone} onChange={(e) => setPhone(e.gex.target.value)} placeholder="+964 …"
                 disabled={loading} // *** MODIFICATION: Added disabled state ***
               />
 
