@@ -12,6 +12,8 @@
     "react-dom": "^18.3.1",
     "googleapis": "^139.0.0",
     "busboy": "^1.6.0"
+      "firebase": "^12.5.0",
+    "framer-motion": "^12.23.24"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
@@ -21,8 +23,7 @@
     "typescript": "^5.4.5",
     "vite": "^5.4.8"
     "busboy": "^1.6.0",
-    "firebase": "^12.5.0",
-    "framer-motion": "^12.23.24"
+  
   }
 
 }
