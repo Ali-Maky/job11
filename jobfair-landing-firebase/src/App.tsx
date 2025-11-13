@@ -183,6 +183,9 @@ export default function JobFairLanding() {
   const [admin, setAdmin] = useState(getIsAdmin());
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+  
+  // *** NEW: State for export button ***
+  const [isExporting, setIsExporting] = useState(false);
 
   // persist jobs
   React.useEffect(() => {
@@ -278,6 +281,23 @@ export default function JobFairLanding() {
       alert(`Loaded ${normalized.length} vacancies from sheet.`);
     } catch (e) {
       alert("Failed to load from the provided URL. Make sure it is a public CSV.");
+    }
+  }
+
+  // *** NEW: Function to call the export API ***
+  async function handleExportApplications() {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      // Trigger the download by opening the API route
+      // Using window.open is the simplest way to trigger a browser download from an API
+      window.open('/api/export-applications', '_self');
+    } catch (err) {
+      console.error(err);
+      alert("Error exporting applications. Check console.");
+    } finally {
+      // Add a small delay to prevent rapid double-clicks
+      setTimeout(() => setIsExporting(false), 2000);
     }
   }
 
@@ -378,6 +398,16 @@ export default function JobFairLanding() {
               >
                 Export current as JSON
               </button>
+              
+              {/* *** NEW: Export Applications Button *** */}
+              <button
+                onClick={handleExportApplications}
+                disabled={isExporting}
+                className="rounded-2xl border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isExporting ? "Generating..." : "Export Applications (CSV)"}
+              </button>
+              
               <details className="rounded-2xl border border-gray-200 bg-white px-4 py-2 text-sm">
                 <summary className="cursor-pointer select-none">Load from Google Sheet (CSV URL)</summary>
                 <div className="mt-3 flex gap-2">
@@ -550,7 +580,6 @@ function JobModal({ job, onClose, onSubmitted }: JobModalProps) {
     return "";
   }
 
-  // *** MODIFICATION: Swapped to Firebase Backend ***
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const v = validate();
@@ -559,7 +588,6 @@ function JobModal({ job, onClose, onSubmitted }: JobModalProps) {
     setLoading(true);
 
     try {
-      // 1) Prepare Form Data
       const fd = new FormData();
       fd.append("jobId", job.id);
       fd.append("jobTitle", job.title);
@@ -572,7 +600,6 @@ function JobModal({ job, onClose, onSubmitted }: JobModalProps) {
       fd.append("phone", phone);
       fd.append("file", file as File, file!.name);
 
-      // 2) Send to our Firebase API route
       const resp = await fetch("/api/apply-job", { method: "POST", body: fd });
       
       let data;
