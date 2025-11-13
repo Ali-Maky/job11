@@ -1,21 +1,92 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import { db, storage } from './_firebase.js';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import Busboy from 'busboy';
+import { Buffer } from 'node:buffer'; // <-- ADD THIS LINE
 
-// Your Firebase configuration, pulled from Vercel Environment Variables
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID,
+// This config tells Vercel to not parse the body, so we can stream the file
+export const config = {
+  api: {
+    bodyParser: false,
+  },
 };
 
-// Initialize Firebase only once
-// Check if an app is already initialized before trying to initialize one
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// Helper function to parse the multipart/form-data
+function parseMultipart(req) {
+  return new Promise((resolve, reject) => {
+    const busboy = Busboy({ headers: req.headers });
+    const fields = {};
+    const files = [];
 
-// Export the database and storage services
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+    busboy.on('field', (fieldname, val) => {
+      fields[fieldname] = val;
+    });
+
+    busboy.on('file', (fieldname, file, { filename, mimeType }) => {
+      const chunks = [];
+      file.on('data', (data) => chunks.push(data));
+      file.on('end', () => {
+        files.push({
+          fieldname,
+          buffer: Buffer.concat(chunks), // This line needs the imported Buffer
+          filename,
+          mimeType,
+        });
+      });
+    });
+
+    busboy.on('error', reject);
+    busboy.on('finish', () => resolve({ fields, files }));
+
+    req.pipe(busboy);
+  });
+}
+
+// The main API handler
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ ok: false, error: 'Method Not Allowed' });
+  }
+
+  try {
+    // 1. Parse the incoming form data (fields and file)
+    const { fields, files } = await parseMultipart(req);
+    const file = files[0];
+
+    if (!file) {
+      return res.status(400).json({ ok: false, error: 'No file uploaded.' });
+    }
+
+    // 2. Upload the file to Firebase Storage
+    const storagePath = `applications/${fields.jobId || 'unknown'}_${Date.now()}_${file.filename}`;
+    const storageRef = ref(storage, storagePath);
+    
+    await uploadBytes(storageRef, file.buffer, {
+      contentType: file.mimeType,
+    });
+
+    const cvUrl = await getDownloadURL(storageRef);
+
+    // 3. Save the application data (including the URL) to Firestore
+    const applicationData = {
+      ...fields, 
+      cvUrl: cvUrl,
+      storagePath: storagePath,
+      submittedAt: serverTimestamp(), 
+    };
+
+    const docRef = await addDoc(collection(db, 'applications'), applicationData);
+
+    // 4. Send a success response
+    return res.status(200).json({ 
+      ok: true, 
+      id: docRef.id, 
+      cvUrl: cvUrl 
+    });
+
+  } catch (e) {
+    console.error("Apply Job Error:", e);
+    const message = e instanceof Error ? e.message : String(e);
+    return res.status(500).json({ ok: false, error: message });
+  }
+}
