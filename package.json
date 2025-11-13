@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "busboy": "^1.6.0",
-    "firebase": "^12.5.0",
-    "framer-motion": "^12.23.24"
-  }
-}
