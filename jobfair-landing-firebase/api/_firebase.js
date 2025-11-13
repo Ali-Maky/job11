@@ -1,8 +1,8 @@
-const { initializeApp } = require("firebase/app");
-const { getFirestore, collection, addDoc, serverTimestamp } = require("firebase/firestore/lite");
-const { getStorage, ref, uploadBytes, getDownloadURL } = require("firebase/storage");
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
-// Load config from Vercel environment variables
+// Your Firebase configuration, pulled from Vercel Environment Variables
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
   authDomain: process.env.FIREBASE_AUTH_DOMAIN,
@@ -10,21 +10,11 @@ const firebaseConfig = {
   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.FIREBASE_APP_ID,
-  // measurementId: process.env.FIREBASE_MEASUREMENT_ID, // Optional
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+// Initialize Firebase only once
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-module.exports = {
-  db,
-  storage,
-  collection,
-  addDoc,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  serverTimestamp,
-};
+// Export the database and storage services
+export const db = getFirestore(app);
+export const storage = getStorage(app);
