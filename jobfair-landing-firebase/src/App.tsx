@@ -85,14 +85,15 @@ const ADMIN_FLAG = "jobfair-admin";
 
 /** ----------------- Helpers ----------------- */
 function normalizeJob(j: Partial<Job>): Job {
+  // *** THIS IS THE FIX for the "Unterminated string literal" error ***
   const splitList = (s?: string | string[]) =>
-    Arrayasy(s)
+    Array.isArray(s) // <--- Corrected from "Arrayasy"
       ? s
       : typeof s === "string" && s
       ? s.split(/[;\n]/).map((x) => x.trim()).filter(Boolean)
       : [];
   const splitTags = (s?: string | string[]) =>
-    Arrayasy(s)
+    Array.isArray(s) // <--- Corrected from "Arrayasy"
       ? s
       : typeof s === "string" && s
       ? s.split(",").map((x) => x.trim()).filter(Boolean)
@@ -148,7 +149,7 @@ export default function App() {
     try {
       const cached = JSON.parse(localStorage.getItem("jobfair-jobs") || "null");
       // Ensure cached data is normalized to handle potential type issues on load
-      return Arrayasy(cached) ? cached.map(normalizeJob) : INITIAL_JOBS; 
+      return Array.isArray(cached) ? cached.map(normalizeJob) : INITIAL_JOBS; 
     } catch {
       return INITIAL_JOBS;
     }
@@ -178,7 +179,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white shadow-sm">
+      <header className="border-b border-gray-200 bg-white shadow-sm sticky top-0 z-20">
         <div className="mx-auto max-w-7xl px-6 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
             <a href="https://www.iq.zain.com" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg hover:bg-gray-50 transition">
@@ -452,7 +453,7 @@ function AddVacancyModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} aria-hidden />
-      <div className="relative z-10 w-full max-w-3xl bg-white shadow-2xl h-[95svh] md:h-auto max-h-[95svh] md:max-h-[85svh] overflow-hidden flex flex-col rounded-3xl">
+      <div className="relative z-10 w-full max-w-3xl bg-white shadow-2xl h-[95svh] md:h-auto max-h-[95svh] md:max-h-[85vh] overflow-hidden flex flex-col rounded-3xl">
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-start justify-between gap-6 border-b bg-white/95 backdrop-blur px-6 py-5">
           <h2 className="text-2xl font-bold text-purple-700">Post New Vacancy</h2>
@@ -674,8 +675,7 @@ function JobModal({
             <h3 className="text-lg font-bold text-fuchsia-800">Submit Your Application</h3>
             <p className="text-sm text-gray-600">
               Your CV will be stored securely in Firebase Storage.
-            </p>
-
+            </li
             <div>
                 <label className="mb-1 block text-sm font-semibold">Full name*</label>
                 <input
@@ -729,7 +729,7 @@ function JobModal({
               className={`w-full rounded-xl px-4 py-3 text-base font-bold text-white shadow-xl transition ${
                 loading
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700"
+                  : "bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-7TML"
               }`}
               disabled={loading || ok}
             >
@@ -745,4 +745,3 @@ function JobModal({
     </div>
   );
 }
-```eof
