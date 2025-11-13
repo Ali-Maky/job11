@@ -104,13 +104,13 @@ const classNames = (...xs: (string | boolean | undefined)[]) => xs.filter(Boolea
 
 function normalizeJob(j: NewJobInput): Job {
   const splitList = (s?: string | string[]) =>
-    Array.isArray(s) // <-- FIX: Was 'Arrayasy'
+    Array.isArray(s)
       ? s
       : typeof s === "string" && s
       ? s.split(/[;\n]/).map((x) => x.trim()).filter(Boolean)
       : [];
   const splitTags = (s?: string | string[]) =>
-    Array.isArray(s) // <-- FIX: Was 'Arrayasy'
+    Array.isArray(s)
       ? s
       : typeof s === "string" && s
       ? s.split(",").map((x) => x.trim()).filter(Boolean)
@@ -173,7 +173,6 @@ export default function JobFairLanding() {
   const [jobs, setJobs] = useState<Job[]>(() => {
     try {
       const cached = JSON.parse(localStorage.getItem("job-fair-jobs") || "null");
-      // *** FIX: Added .map(normalizeJob) to fix build errors from invalid cached data ***
       return Array.isArray(cached) ? cached.map(normalizeJob) : INITIAL_JOBS.map(normalizeJob);
     } catch {
       return INITIAL_JOBS.map(normalizeJob);
@@ -385,7 +384,7 @@ export default function JobFairLanding() {
                   <input id="sheet-url" className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:border-purple-500" placeholder="Paste published CSV URL" />
                   <button onClick={() => {
                     const el = document.getElementById('sheet-url');
-                    const url = el && 'value' in el ? (el as HTMLInputElement).value : ''; // FIX: Cast el to HTMLInputElement
+                    const url = el && 'value' in el ? (el as HTMLInputElement).value : '';
                     if (url) loadFromSheet(url);
                   }} className="rounded-xl bg-purple-600 px-3 py-2 text-white text-sm">Load</button>
                 </div>
@@ -521,8 +520,6 @@ export default function JobFairLanding() {
 
 // --- All Modals and Helper Components ---
 
-// FIX: All component functions must be defined at the top level, outside the 'App' component.
-
 interface JobModalProps {
   job: Job;
   onClose: () => void;
@@ -533,16 +530,14 @@ function JobModal({ job, onClose, onSubmitted }: JobModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [file, setFile] = useState<File | null>(null); // FIX: Use | null
+  const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [ok, setOk] = useState(false);
-  const [loading, setLoading] = useState(false); // *** MODIFICATION: Added loading state ***
+  const [loading, setLoading] = useState(false);
 
-  function validate(): string { // FIX: Return type string
+  function validate(): string {
     if (!name.trim()) return "Please enter your full name.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Please enter a valid email.";
-    // Simple phone validation (at least 7 digits, allows +, -, (, ), space)
-    if (phone.trim() && !/^[0-9+\-()\s]{7,}$/.test(phone)) return "Please enter a valid phone number.";
     if (!file) return "Please attach your CV (PDF or DOCX).";
     const okType = [
       "application/pdf",
@@ -561,7 +556,7 @@ function JobModal({ job, onClose, onSubmitted }: JobModalProps) {
     const v = validate();
     if (v) { setError(v); setOk(false); return; }
     setError("");
-    setLoading(true); // Set loading
+    setLoading(true);
 
     try {
       // 1) Prepare Form Data
@@ -598,7 +593,7 @@ function JobModal({ job, onClose, onSubmitted }: JobModalProps) {
       setOk(false);
       setError(err?.message || "Submission failed");
     } finally {
-      setLoading(false); // Unset loading
+      setLoading(false);
     }
   }
 
@@ -611,7 +606,6 @@ function JobModal({ job, onClose, onSubmitted }: JobModalProps) {
       <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden />
       <motion.div
         initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
-        // Panel: no scroll; body below scrolls
         className="relative z-10 w-full max-w-3xl bg-white shadow-xl md:rounded-3xl
                    h-[90svh] md:h-auto max-h-[90svh] md:max-h-[85vh]
                    overflow-hidden flex flex-col"
@@ -659,14 +653,13 @@ function JobModal({ job, onClose, onSubmitted }: JobModalProps) {
             {/* Right: apply form */}
             <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 p-4 pb-24">
               <h3 className="text-base font-semibold">Apply for this role</h3>
-              {/* *** MODIFICATION: Updated text *** */}
               <p className="mb-4 mt-1 text-sm text-gray-600">Your CV will be stored securely in Firebase Storage.</p>
 
               <label className="mb-2 block text-sm font-medium">Full name</label>
               <input
                 className="mb-3 w-full rounded-xl border border-gray-200 px-3 py-2 focus:border-purple-500 focus:outline-none"
                 value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name"
-                disabled={loading} // *** MODIFICATION: Added disabled state ***
+                disabled={loading}
               />
 
               <label className="mb-2 mt-1 block text-sm font-medium">Email</label>
@@ -674,14 +667,14 @@ function JobModal({ job, onClose, onSubmitted }: JobModalProps) {
                 type="email"
                 className="mb-3 w-full rounded-xl border border-gray-200 px-3 py-2 focus:border-purple-500 focus:outline-none"
                 value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com"
-                disabled={loading} // *** MODIFICATION: Added disabled state ***
+                disabled={loading}
               />
 
               <label className="mb-2 mt-1 block text-sm font-medium">Phone</label>
               <input
                 className="mb-3 w-full rounded-xl border border-gray-200 px-3 py-2 focus:border-purple-500 focus:outline-none"
-                value={phone} onChange={(e) => setPhone(e.gex.target.value)} placeholder="+964 …"
-                disabled={loading} // *** MODIFICATION: Added disabled state ***
+                value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+964 …"
+                disabled={loading}
               />
 
               <label className="mb-2 mt-1 block text-sm font-medium">CV (PDF / DOCX)</label>
@@ -689,8 +682,8 @@ function JobModal({ job, onClose, onSubmitted }: JobModalProps) {
                 type="file"
                 accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 className="mb-4 w-full rounded-xl border border-gray-200 px-3 py-2 file:mr-3 file:rounded-lg file:border-0 file:bg-purple-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-purple-700"
-                onChange={(e) => setFile(e.target.files?.[0] || null)} // FIX: Use | null
-                disabled={loading} // *** MODIFICATION: Added disabled state ***
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                disabled={loading}
               />
 
               {error && <div className="mb-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
@@ -699,7 +692,7 @@ function JobModal({ job, onClose, onSubmitted }: JobModalProps) {
               <button
                 type="submit"
                 className="w-full rounded-2xl bg-gradient-to-r from-purple-600 to-fuchsia-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:opacity-70 disabled:cursor-not-allowed"
-                disabled={loading || ok} // *** MODIFICATION: Added disabled state ***
+                disabled={loading || ok}
               >
                 {loading ? "Submitting..." : "Submit Application"} 
               </button>
@@ -725,7 +718,7 @@ interface AddVacancyModalProps {
   onSave: (j: NewJobInput) => void;
 }
 
-function AddVacancyModal({ onClose, onSave }: AddVacancyModalProps) { // FIX: Added types
+function AddVacancyModal({ onClose, onSave }: AddVacancyModalProps) {
   const [form, setForm] = useState({
     title: "",
     company: "",
@@ -737,11 +730,11 @@ function AddVacancyModal({ onClose, onSave }: AddVacancyModalProps) { // FIX: Ad
     requirements: "",
   });
   const [error, setError] = useState("");
-  // FIX: Added type to event
+  
   const set = (k: string) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => 
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  function handleSubmit(e: FormEvent) { // FIX: Added type to event
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!form.title.trim()) return setError("Title is required.");
     setError("");
@@ -808,7 +801,6 @@ function AddVacancyModal({ onClose, onSave }: AddVacancyModalProps) { // FIX: Ad
               <label className="mb-1 block text-sm font-medium">Requirements (semicolon or new line)</label>
               <textarea rows={4} className="w-full rounded-xl border border-gray-200 px-3 py-2" value={form.requirements} onChange={set("requirements")} placeholder={"3+ years SQL;\nPower BI"} />
             </div>
-            {/* FIX: Was 'error and' */}
             {error && <div className="md:col-span-2 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
           </form>
         </div>
@@ -830,15 +822,13 @@ interface AdminLoginModalProps {
   onSuccess: () => void;
 }
 
-function AdminLoginModal({ onClose, onSuccess }: AdminLoginModalProps) { // FIX: Added types
+function AdminLoginModal({ onClose, onSuccess }: AdminLoginModalProps) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
 
-  function submit(e: FormEvent) { // FIX: Added type
+  function submit(e: FormEvent) {
     e.preventDefault();
-    // NOTE: Front-end only, not secure. Replace with real auth for production.
-    // FIX: Was 'window and'
-    const PASS = (window as any)?.ADMIN_PASSCODE || "ZAIN-ADMIN"; // override by setting window.ADMIN_PASSCODE
+    const PASS = (window as any)?.ADMIN_PASSCODE || "ZAIN-ADMIN";
     if (code.trim() === PASS) {
       setError("");
       onSuccess?.();
@@ -855,7 +845,6 @@ function AdminLoginModal({ onClose, onSuccess }: AdminLoginModalProps) { // FIX:
         <p className="mt-2 text-sm text-gray-600">Enter the admin passcode to manage vacancies.</p>
         <form onSubmit={submit} className="mt-4 space-y-3">
           <input value={code} onChange={(e)=>setCode(e.target.value)} placeholder="Enter passcode" className="w-full rounded-xl border border-gray-200 px-3 py-2 focus:border-purple-500" />
-          {/* FIX: Was 'error and' */}
           {error && <div className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
           <div className="flex justify-end gap-2">
             <button type="button" onClick={onClose} className="rounded-2xl border border-gray-300 px-4 py-2 text-sm">Cancel</button>
