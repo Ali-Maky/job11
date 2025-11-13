@@ -85,15 +85,14 @@ const ADMIN_FLAG = "jobfair-admin";
 
 /** ----------------- Helpers ----------------- */
 function normalizeJob(j: Partial<Job>): Job {
-  // *** THIS IS THE FIX for the "Unterminated string literal" error ***
   const splitList = (s?: string | string[]) =>
-    Array.isArray(s) // <--- Corrected from "Arrayasy"
+    Array.isArray(s)
       ? s
       : typeof s === "string" && s
       ? s.split(/[;\n]/).map((x) => x.trim()).filter(Boolean)
       : [];
   const splitTags = (s?: string | string[]) =>
-    Array.isArray(s) // <--- Corrected from "Arrayasy"
+    Array.isArray(s)
       ? s
       : typeof s === "string" && s
       ? s.split(",").map((x) => x.trim()).filter(Boolean)
@@ -675,7 +674,7 @@ function JobModal({
             <h3 className="text-lg font-bold text-fuchsia-800">Submit Your Application</h3>
             <p className="text-sm text-gray-600">
               Your CV will be stored securely in Firebase Storage.
-            </li
+            </p> 
             <div>
                 <label className="mb-1 block text-sm font-semibold">Full name*</label>
                 <input
@@ -729,7 +728,7 @@ function JobModal({
               className={`w-full rounded-xl px-4 py-3 text-base font-bold text-white shadow-xl transition ${
                 loading
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-7TML"
+                  : "bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700"
               }`}
               disabled={loading || ok}
             >
