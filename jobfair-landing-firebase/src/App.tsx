@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect, useMemo, FormEvent, ChangeEvent } from "react";
+import React, { useState, useEffect, useMemo, FormEvent, ChangeEvent } from "react";
 
 /** ---- Assets ----
  * Put your Zain logo at /public/zain-logo.png (or edit this path).
@@ -26,7 +25,7 @@ const INITIAL_JOBS: Job[] = [
     company: "ZINC Partners",
     location: "Baghdad, IQ (Hybrid)",
     type: "Full-time",
-    tags: ["React", "Tailwind", "UI"],
+    tags: ["React", "Tailwind", "UI", "TypeScript"],
     description:
       "Build and polish user-facing features, collaborate with designers, and ensure high performance across modern browsers.",
     responsibilities: [
@@ -37,24 +36,48 @@ const INITIAL_JOBS: Job[] = [
     requirements: [
       "2+ years experience with React",
       "Solid knowledge of HTML/CSS/JS",
-      "Familiarity with REST/GraphQL",
+      "Familiarity with REST/GraphQL APIs",
     ],
   },
   {
     id: "2",
-    title: "Data Analyst",
+    title: "Cloud Data Engineer",
     company: "Zain Iraq",
-    location: "Basra, IQ (On-site)",
-    type: "Contract",
-    tags: ["SQL", "Power BI", "Python"],
+    location: "Erbil, IQ (Hybrid)",
+    type: "Full-time",
+    tags: ["Azure", "SQL", "Python", "Data Lakes"],
     description:
-      "Turn data into insights and dashboards that guide leadership decisions. Own data quality and storytelling.",
+      "Design, construct, and maintain data pipelines using cloud services to support advanced analytics and machine learning models.",
     responsibilities: [
-      "Build reports and dashboards (Power BI/Tableau)",
-      "Perform ETL and data validation",
-      "Partner with stakeholders to define KPIs",
+      "Develop scalable ETL processes in Azure/AWS/GCP",
+      "Ensure data quality and governance standards are met",
+      "Optimize data architecture for speed and cost efficiency",
     ],
-    requirements: ["3+ years in analytics", "Advanced SQL, basic Python", "Data viz portfolio"],
+    requirements: [
+      "4+ years in data engineering",
+      "Expertise in cloud data warehousing (e.g., Snowflake, Azure SQL)",
+      "Strong Python/SQL skills",
+    ],
+  },
+  {
+    id: "3",
+    title: "UX/UI Designer",
+    company: "Future Skills Academy",
+    location: "Remote",
+    type: "Contract",
+    tags: ["Figma", "Design System", "Prototyping"],
+    description:
+      "Translate complex user needs and business goals into intuitive, beautiful, and accessible user interfaces and experiences.",
+    responsibilities: [
+      "Conduct user research and usability testing",
+      "Design user flows, wireframes, and prototypes",
+      "Maintain and expand the company's design system in Figma",
+    ],
+    requirements: [
+      "3+ years professional UX/UI experience",
+      "Mastery of Figma or similar tools",
+      "Strong portfolio demonstrating process and final work",
+    ],
   },
 ];
 
@@ -63,13 +86,13 @@ const ADMIN_FLAG = "jobfair-admin";
 /** ----------------- Helpers ----------------- */
 function normalizeJob(j: Partial<Job>): Job {
   const splitList = (s?: string | string[]) =>
-    Array.isArray(s)
+    Arrayasy(s)
       ? s
       : typeof s === "string" && s
       ? s.split(/[;\n]/).map((x) => x.trim()).filter(Boolean)
       : [];
   const splitTags = (s?: string | string[]) =>
-    Array.isArray(s)
+    Arrayasy(s)
       ? s
       : typeof s === "string" && s
       ? s.split(",").map((x) => x.trim()).filter(Boolean)
@@ -125,7 +148,7 @@ export default function App() {
     try {
       const cached = JSON.parse(localStorage.getItem("jobfair-jobs") || "null");
       // Ensure cached data is normalized to handle potential type issues on load
-      return Array.isArray(cached) ? cached.map(normalizeJob) : INITIAL_JOBS; 
+      return Arrayasy(cached) ? cached.map(normalizeJob) : INITIAL_JOBS; 
     } catch {
       return INITIAL_JOBS;
     }
@@ -148,20 +171,21 @@ export default function App() {
 
   function deleteJob(id: string) {
     if (!admin) return;
-    if (!window.confirm("Delete this vacancy?")) return;
+    if (!window.confirm("Delete this vacancy? This action cannot be undone.")) return;
     setJobs((prev) => prev.filter((j) => j.id !== id));
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-900 font-sans">
+    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white/70 backdrop-blur">
-        <div className="mx-auto max-w-7xl px-6 py-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            <a href="https://www.iq.zain.com" target="_blank" rel="noopener noreferrer">
-              <img src={ZAIN_LOGO_URL} className="h-10 w-auto" alt="Zain Iraq" />
+      <header className="border-b border-gray-200 bg-white shadow-sm">
+        <div className="mx-auto max-w-7xl px-6 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4">
+            <a href="https://www.iq.zain.com" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg hover:bg-gray-50 transition">
+              {/* Note: Ensure zain-logo.png is available in the public folder */}
+              <img src={ZAIN_LOGO_URL} className="h-9 w-auto" alt="Zain Iraq" />
             </a>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+            <h1 className="text-xl md:text-2xl font-extrabold tracking-tight text-purple-800">
               Woman In Tech 2025 - Job Fair
             </h1>
           </div>
@@ -169,24 +193,24 @@ export default function App() {
             {!admin ? (
               <button
                 onClick={() => setShowAdminLogin(true)}
-                className="rounded-2xl border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+                className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition duration-150"
                 title="Organizer sign in"
               >
-                Organizer sign in
+                Organizer Sign In
               </button>
             ) : (
               <>
-                <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
-                  Admin
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                  Admin Access
                 </span>
                 <button
                   onClick={() => {
                     setAdmin(false);
                     setAdminState(false);
                   }}
-                  className="rounded-2xl border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+                  className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition"
                 >
-                  Sign out
+                  Sign Out
                 </button>
               </>
             )}
@@ -194,112 +218,125 @@ export default function App() {
         </div>
       </header>
 
-      {/* Search / Filter */}
-      <section className="mx-auto max-w-7xl px-6 pt-6">
-        <div className="grid gap-3 md:grid-cols-3">
-          <input
-            className="md:col-span-2 w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 outline-none focus:border-purple-500 shadow-sm"
-            placeholder="Search by title, company, location, or tag…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <select
-            className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 outline-none focus:border-purple-500 shadow-sm appearance-none pr-8"
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-          >
-            {["All", ...Array.from(new Set((jobs || []).map((j) => j.type)))].map((t) => (
-              <option key={t}>{t}</option>
-            ))}
-          </select>
-        </div>
-      </section>
-
-      {/* Admin controls */}
-      <section className="mx-auto max-w-7xl px-6 py-4">
-        {!admin ? (
-          <div className="rounded-2xl border border-dashed border-gray-300 p-4 text-sm text-gray-600">
-            Organizers: <button className="underline hover:text-purple-600" onClick={() => setShowAdminLogin(true)}>sign in</button> to add or delete vacancies.
-          </div>
-        ) : (
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-sm text-gray-600">
-              Admin can add or remove vacancies. Changes are saved locally (no backend).
+      {/* Main Content Area */}
+      <main className="mx-auto max-w-7xl px-6 py-8">
+        
+        {/* Search / Filter */}
+        <section className="mb-6">
+          <div className="grid gap-4 md:grid-cols-4">
+            <input
+              className="md:col-span-3 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none shadow-inner focus:border-fuchsia-500 transition"
+              placeholder="Search by title, company, location, or tag…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <div className="relative">
+                <select
+                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none shadow-inner focus:border-fuchsia-500 appearance-none pr-10 transition"
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                >
+                {["All", ...Array.from(new Set((jobs || []).map((j) => j.type)))].map((t) => (
+                    <option key={t}>{t}</option>
+                ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
             </div>
-            <button
-              onClick={() => setShowAdd(true)}
-              className="rounded-2xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-purple-700 transition"
-            >
-              + Add vacancy
-            </button>
           </div>
-        )}
-      </section>
+        </section>
 
-      {/* Jobs grid */}
-      <section className="mx-auto max-w-7xl px-6 pb-20">
-        {results.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-300 p-8 text-center text-gray-500">
-            No vacancies found. Try a different search.
-          </div>
-        ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {results.map((job) => (
+        {/* Admin controls */}
+        <section className="mb-8">
+          {!admin ? (
+            <div className="rounded-xl border border-dashed border-purple-300 bg-purple-50 p-4 text-sm text-purple-700">
+              Organizers: <button className="underline font-semibold hover:text-purple-900" onClick={() => setShowAdminLogin(true)}>sign in</button> to manage vacancies.
+            </div>
+          ) : (
+            <div className="flex items-center justify-between gap-3 p-2 bg-white rounded-xl shadow-inner border border-gray-100">
+              <div className="text-sm text-gray-600">
+                Admin view active. Use the buttons below to manage content.
+              </div>
               <button
-                key={job.id}
-                onClick={() => setSelected(job)}
-                className="group text-left rounded-2xl border border-gray-200 bg-white p-5 shadow-lg transition hover:border-fuchsia-400 hover:shadow-xl"
+                onClick={() => setShowAdd(true)}
+                className="rounded-xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-lg hover:bg-purple-700 transition"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-lg font-bold tracking-tight text-purple-800">{job.title}</h3>
-                    <p className="mt-1 text-sm text-gray-600">
-                      {job.company} • {job.location}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-fuchsia-100 px-3 py-1 text-xs font-medium text-fuchsia-800">
-                      {job.type}
-                    </span>
-                    {admin && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteJob(job.id);
-                        }}
-                        className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-600 hover:bg-red-200 transition"
-                        title="Delete vacancy"
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <p className="mt-3 line-clamp-2 text-sm text-gray-700">{job.description}</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {(job.tags || []).map((t) => (
-                    <span key={t} className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-700">
-                      #{t}
-                    </span>
-                  ))}
-                </div>
-                {submitted[job.id] && (
-                  <div className="mt-4 rounded-xl bg-green-50 px-3 py-2 text-xs font-medium text-green-700">
-                    Application submitted successfully!
-                  </div>
-                )}
+                + Post New Vacancy
               </button>
-            ))}
-          </div>
-        )}
-      </section>
+            </div>
+          )}
+        </section>
+
+        {/* Jobs grid */}
+        <section>
+          {results.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-gray-300 p-12 text-center text-gray-500 bg-white">
+              <p className="text-xl font-medium">No vacancies found.</p>
+              <p className="text-sm mt-2">Try adjusting your search query or filters.</p>
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {results.map((job) => (
+                <button
+                  key={job.id}
+                  onClick={() => setSelected(job)}
+                  className="group text-left rounded-2xl border border-gray-100 bg-white p-6 shadow-xl transition transform hover:scale-[1.01] hover:shadow-2xl hover:border-fuchsia-400"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-xl font-bold tracking-tight text-purple-800 group-hover:text-fuchsia-600 transition">{job.title}</h3>
+                      <p className="mt-1 text-sm text-gray-600">
+                        {job.company}
+                      </p>
+                      <p className="mt-0.5 text-xs font-medium text-gray-500 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
+                        {job.location}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="rounded-full bg-fuchsia-100 px-3 py-1 text-xs font-semibold text-fuchsia-800 whitespace-nowrap">
+                        {job.type}
+                      </span>
+                      {admin && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteJob(job.id);
+                          }}
+                          className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-600 hover:bg-red-200 transition"
+                          title="Delete vacancy"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="mt-4 line-clamp-3 text-sm text-gray-700">{job.description}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {(job.tags || []).slice(0, 4).map((t) => (
+                      <span key={t} className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-700 font-medium">
+                        #{t}
+                      </span>
+                    ))}
+                  </div>
+                  {submitted[job.id] && (
+                    <div className="mt-4 rounded-xl bg-green-50 px-3 py-2 text-xs font-medium text-green-700 border border-green-200">
+                      Application submitted successfully!
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
 
       {/* Modals */}
       {selected && (
         <JobModal
           job={selected}
           onClose={() => setSelected(null)}
-          // CALLS THE NEW UNIFIED API
           onSubmitted={(id) => setSubmitted((s) => ({ ...s, [id]: true }))}
         />
       )}
@@ -324,10 +361,10 @@ export default function App() {
       )}
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white/60">
-        <div className="mx-auto max-w-7xl px-6 py-8 text-sm text-gray-500 flex items-center gap-3">
-          <img src={ZAIN_LOGO_URL} alt="Zain Iraq" className="h-6 w-auto opacity-80" />
-          <span>© {new Date().getFullYear()} CER — All rights reserved.</span>
+      <footer className="border-t border-gray-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-6 text-sm text-gray-500 flex flex-col md:flex-row items-center gap-3">
+          <img src={ZAIN_LOGO_URL} alt="Zain Iraq" className="h-5 w-auto opacity-80" />
+          <span className="text-center md:text-left">© {new Date().getFullYear()} CER. Proudly supporting the Iraqi Tech Ecosystem.</span>
         </div>
       </footer>
     </div>
@@ -352,25 +389,25 @@ function AdminLoginModal({ onClose, onSuccess }: { onClose: () => void; onSucces
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden />
-      <div className="relative z-10 w-full max-w-md rounded-3xl bg-white p-6 shadow-xl max-h-[80vh] overflow-y-auto">
-        <h2 className="text-xl font-bold text-purple-800">Organizer Sign In</h2>
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} aria-hidden />
+      <div className="relative z-10 w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl max-h-[80vh] overflow-y-auto">
+        <h2 className="text-2xl font-bold text-purple-700">Organizer Sign In</h2>
         <p className="mt-2 text-sm text-gray-600">Enter the admin passcode to manage vacancies.</p>
-        <form onSubmit={submit} className="mt-4 space-y-4">
+        <form onSubmit={submit} className="mt-5 space-y-4">
           <input
             type="password"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="Enter passcode"
-            className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+            className="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:border-fuchsia-500 focus:ring-1 focus:ring-fuchsia-500 transition"
           />
-          {error && <div className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
-          <div className="flex justify-end gap-3">
-            <button type="button" onClick={onClose} className="rounded-2xl border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50">
+          {error && <div className="rounded-xl bg-red-100 px-3 py-2 text-sm text-red-700 border border-red-200">{error}</div>}
+          <div className="flex justify-end gap-3 pt-2">
+            <button type="button" onClick={onClose} className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
               Cancel
             </button>
-            <button type="submit" className="rounded-2xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-purple-700 transition">
-              Sign in
+            <button type="submit" className="rounded-xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-purple-700 transition">
+              Sign In
             </button>
           </div>
         </form>
@@ -414,81 +451,81 @@ function AddVacancyModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden />
-      <div className="relative z-10 w-full max-w-3xl bg-white shadow-xl h-[95svh] md:h-auto max-h-[95svh] md:max-h-[85svh] overflow-hidden flex flex-col md:rounded-3xl">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} aria-hidden />
+      <div className="relative z-10 w-full max-w-3xl bg-white shadow-2xl h-[95svh] md:h-auto max-h-[95svh] md:max-h-[85svh] overflow-hidden flex flex-col rounded-3xl">
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-6 border-b bg-white/95 backdrop-blur px-6 py-4">
-          <h2 className="text-2xl font-bold text-purple-800">Add New Vacancy</h2>
-          <button onClick={onClose} className="rounded-full bg-gray-100 px-3 py-1 text-sm hover:bg-gray-200">
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-6 border-b bg-white/95 backdrop-blur px-6 py-5">
+          <h2 className="text-2xl font-bold text-purple-700">Post New Vacancy</h2>
+          <button onClick={onClose} className="rounded-xl bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200">
             Close
           </button>
         </div>
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-6 pt-4 pb-28">
-          <form id={formId} onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+        <div className="flex-1 overflow-y-auto overscroll-contain px-6 pt-5 pb-28">
+          <form id={formId} onSubmit={handleSubmit} className="grid gap-5 md:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium">Title*</label>
-              <input className="w-full rounded-xl border border-gray-300 px-4 py-2" value={form.title} onChange={set("title")} />
+              <label className="mb-1 block text-sm font-semibold">Title*</label>
+              <input className="w-full rounded-xl border border-gray-300 px-4 py-2.5 shadow-inner focus:border-fuchsia-500 transition" value={form.title} onChange={set("title")} />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">Company</label>
-              <input className="w-full rounded-xl border border-gray-300 px-4 py-2" value={form.company} onChange={set("company")} />
+              <label className="mb-1 block text-sm font-semibold">Company</label>
+              <input className="w-full rounded-xl border border-gray-300 px-4 py-2.5 shadow-inner focus:border-fuchsia-500 transition" value={form.company} onChange={set("company")} />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">Location</label>
-              <input className="w-full rounded-xl border border-gray-300 px-4 py-2" value={form.location} onChange={set("location")} />
+              <label className="mb-1 block text-sm font-semibold">Location</label>
+              <input className="w-full rounded-xl border border-gray-300 px-4 py-2.5 shadow-inner focus:border-fuchsia-500 transition" value={form.location} onChange={set("location")} />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">Type</label>
-              <select className="w-full rounded-xl border border-gray-300 px-4 py-2" value={form.type} onChange={set("type")}>
+              <label className="mb-1 block text-sm font-semibold">Type</label>
+              <select className="w-full rounded-xl border border-gray-300 px-4 py-2.5 shadow-inner focus:border-fuchsia-500 transition" value={form.type} onChange={set("type")}>
                 {["Full-time", "Part-time", "Contract", "Internship", "Temporary"].map((t) => (
                   <option key={t}>{t}</option>
                 ))}
               </select>
             </div>
             <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium">Tags (comma separated)</label>
-              <input className="w-full rounded-xl border border-gray-300 px-4 py-2" value={form.tags} onChange={set("tags")} />
+              <label className="mb-1 block text-sm font-semibold">Tags (comma separated, max 5)</label>
+              <input className="w-full rounded-xl border border-gray-300 px-4 py-2.5 shadow-inner focus:border-fuchsia-500 transition" value={form.tags} onChange={set("tags")} placeholder="e.g., React, SQL, Cloud" />
             </div>
             <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium">Description</label>
-              <textarea rows={4} className="w-full rounded-xl border border-gray-300 px-4 py-2" value={form.description} onChange={set("description")} />
+              <label className="mb-1 block text-sm font-semibold">Description</label>
+              <textarea rows={3} className="w-full rounded-xl border border-gray-300 px-4 py-2.5 shadow-inner focus:border-fuchsia-500 transition" value={form.description} onChange={set("description")} />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">Responsibilities (semicolon or new line)</label>
+              <label className="mb-1 block text-sm font-semibold">Responsibilities (semicolon or new line)</label>
               <textarea
-                rows={4}
-                className="w-full rounded-xl border border-gray-300 px-4 py-2"
+                rows={5}
+                className="w-full rounded-xl border border-gray-300 px-4 py-2.5 shadow-inner focus:border-fuchsia-500 transition"
                 value={form.responsibilities}
                 onChange={set("responsibilities")}
-                placeholder={"Build dashboards;\nValidate data"}
+                placeholder={"Develop pipelines;\nEnsure data integrity;\nPerform code reviews"}
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">Requirements (semicolon or new line)</label>
+              <label className="mb-1 block text-sm font-semibold">Requirements (semicolon or new line)</label>
               <textarea
-                rows={4}
-                className="w-full rounded-xl border border-gray-300 px-4 py-2"
+                rows={5}
+                className="w-full rounded-xl border border-gray-300 px-4 py-2.5 shadow-inner focus:border-fuchsia-500 transition"
                 value={form.requirements}
                 onChange={set("requirements")}
-                placeholder={"3+ years SQL;\nPower BI"}
+                placeholder={"3+ years experience;\nMastery of SQL;\nFamiliarity with AWS"}
               />
             </div>
             {error && (
-              <div className="md:col-span-2 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+              <div className="md:col-span-2 rounded-xl bg-red-100 px-4 py-3 text-sm text-red-700 border border-red-200">{error}</div>
             )}
           </form>
         </div>
 
         {/* Sticky footer */}
-        <div className="sticky bottom-0 z-10 border-t bg-white/95 backdrop-blur px-6 py-3">
+        <div className="sticky bottom-0 z-10 border-t bg-white/95 backdrop-blur px-6 py-4 shadow-top">
           <div className="flex justify-end gap-3">
-            <button type="button" onClick={onClose} className="rounded-2xl border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50">
+            <button type="button" onClick={onClose} className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
               Cancel
             </button>
-            <button form={formId} type="submit" className="rounded-2xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-purple-700 transition">
-              Save vacancy
+            <button form={formId} type="submit" className="rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg hover:bg-purple-700 transition">
+              Save Vacancy
             </button>
           </div>
         </div>
@@ -549,25 +586,28 @@ function JobModal({
       fd.append("file", file as File, file!.name); // CV file
 
       // 2) Send unified request to new Firebase handler
+      // NOTE: This calls the single API route api/apply-job.js
       const resp = await fetch("/api/apply-job", { method: "POST", body: fd });
       
       let data;
       try {
         data = await resp.json();
       } catch (err) {
-        throw new Error("Received non-JSON response from server.");
+        throw new Error("Received non-JSON response from server. Check Vercel logs.");
       }
       
       if (!resp.ok || !data?.ok) {
-        throw new Error(data?.error || "Submission failed (API Error).");
+        throw new Error(data?.error || "Submission failed (Firebase API Error).");
       }
 
       setOk(true);
       onSubmitted(job.id);
+      // Clear form state after successful submission
       setName("");
       setEmail("");
       setPhone("");
       setFile(null);
+
     } catch (err: any) {
       setOk(false);
       setError(err?.message || "Submission failed due to server error.");
@@ -578,106 +618,125 @@ function JobModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden />
-      <div className="relative z-10 w-full max-w-3xl rounded-t-3xl bg-white p-6 shadow-xl md:rounded-3xl h-[95vh] md:h-auto max-h-[95vh] md:max-h-[85vh] overflow-y-auto overscroll-contain">
-        <div className="flex items-start justify-between gap-6 sticky top-0 bg-white/95 backdrop-blur -mx-6 px-6 pt-2 pb-3 border-b">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} aria-hidden />
+      <div className="relative z-10 w-full max-w-3xl rounded-3xl bg-white p-6 shadow-2xl md:rounded-3xl h-[95vh] md:h-auto max-h-[95vh] md:max-h-[85vh] overflow-y-auto overscroll-contain">
+        
+        {/* Header */}
+        <div className="flex items-start justify-between gap-6 sticky top-0 bg-white/95 backdrop-blur -mx-6 px-6 pt-2 pb-3 border-b mb-6">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-purple-800">{job.title}</h2>
             <p className="mt-1 text-sm text-gray-600">
               {job.company} • {job.location} • {job.type}
             </p>
           </div>
-          <button className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200" onClick={onClose}>
+          <button className="rounded-xl bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200" onClick={onClose}>
             Close
           </button>
         </div>
 
-        <div className="mt-6 grid gap-8 md:grid-cols-2">
+        <div className="grid gap-8 md:grid-cols-2">
           {/* Left: description */}
-          <div>
-            <p className="text-gray-800">{job.description}</p>
+          <div className="md:border-r md:pr-6 border-gray-100">
+            <p className="text-gray-800 leading-relaxed">{job.description}</p>
+            
             {job.responsibilities.length > 0 && (
               <div className="mt-5">
-                <h3 className="text-sm font-semibold text-gray-900">Responsibilities</h3>
-                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+                <h3 className="text-sm font-semibold text-purple-700 border-b pb-1 border-purple-100">Responsibilities</h3>
+                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-gray-700">
                   {job.responsibilities.map((r, i) => (
                     <li key={i}>{r}</li>
                   ))}
                 </ul>
               </div>
             )}
+            
             {job.requirements.length > 0 && (
               <div className="mt-5">
-                <h3 className="text-sm font-semibold text-gray-900">Requirements</h3>
-                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+                <h3 className="text-sm font-semibold text-fuchsia-700 border-b pb-1 border-fuchsia-100">Requirements</h3>
+                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-gray-700">
                   {job.requirements.map((r, i) => (
                     <li key={i}>{r}</li>
                   ))}
                 </ul>
               </div>
             )}
+            <div className="mt-6 flex flex-wrap gap-2">
+                {(job.tags || []).map((t) => (
+                    <span key={t} className="rounded-full bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700">
+                      #{t}
+                    </span>
+                ))}
+            </div>
           </div>
 
           {/* Right: apply form */}
-          <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 p-6 pb-24 shadow-md bg-white">
-            <h3 className="text-lg font-bold text-fuchsia-800">Apply for this Role</h3>
-            <p className="mb-4 mt-1 text-sm text-gray-600">
+          <form onSubmit={handleSubmit} className="p-1 space-y-4">
+            <h3 className="text-lg font-bold text-fuchsia-800">Submit Your Application</h3>
+            <p className="text-sm text-gray-600">
               Your CV will be stored securely in Firebase Storage.
             </p>
 
-            <label className="mb-2 block text-sm font-medium">Full name*</label>
-            <input
-              className="mb-3 w-full rounded-xl border border-gray-300 px-4 py-2 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              disabled={loading}
-            />
+            <div>
+                <label className="mb-1 block text-sm font-semibold">Full name*</label>
+                <input
+                className="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition shadow-sm"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your full name"
+                disabled={loading}
+                />
+            </div>
 
-            <label className="mb-2 mt-1 block text-sm font-medium">Email*</label>
-            <input
-              type="email"
-              className="mb-3 w-full rounded-xl border border-gray-300 px-4 py-2 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@example.com"
-              disabled={loading}
-            />
+            <div>
+                <label className="mb-1 block text-sm font-semibold">Email*</label>
+                <input
+                type="email"
+                className="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition shadow-sm"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                disabled={loading}
+                />
+            </div>
 
-            <label className="mb-2 mt-1 block text-sm font-medium">Phone</label>
-            <input
-              className="mb-3 w-full rounded-xl border border-gray-300 px-4 py-2 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+964 …"
-              disabled={loading}
-            />
+            <div>
+                <label className="mb-1 block text-sm font-semibold">Phone</label>
+                <input
+                className="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition shadow-sm"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+964 … (Optional)"
+                disabled={loading}
+                />
+            </div>
 
-            <label className="mb-2 mt-1 block text-sm font-medium">CV (PDF / DOCX)*</label>
-            <input
-              type="file"
-              accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-              className="mb-4 w-full rounded-xl border border-gray-300 px-4 py-2 file:mr-3 file:rounded-lg file:border-0 file:bg-fuchsia-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-fuchsia-700 disabled:file:opacity-50"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-              disabled={loading}
-            />
+            <div>
+                <label className="mb-1 block text-sm font-semibold">CV (PDF / DOCX)*</label>
+                <input
+                type="file"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                className="w-full rounded-xl border border-gray-300 p-2.5 file:mr-3 file:rounded-lg file:border-0 file:bg-fuchsia-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-fuchsia-700 disabled:file:opacity-50 shadow-sm"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                disabled={loading}
+                />
+            </div>
 
-            {error && <div className="mb-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
-            {ok && <div className="mb-3 rounded-xl bg-green-50 px-3 py-2 text-sm text-green-700">Submitted! We have received your application.</div>}
+            {error && <div className="rounded-xl bg-red-100 px-4 py-3 text-sm text-red-700 border border-red-200">{error}</div>}
+            {ok && <div className="rounded-xl bg-green-100 px-4 py-3 text-sm text-green-700 border border-green-200">Application submitted successfully!</div>}
 
             <button
               type="submit"
-              className={`w-full rounded-2xl px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition ${
+              className={`w-full rounded-xl px-4 py-3 text-base font-bold text-white shadow-xl transition ${
                 loading
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:opacity-95"
+                  : "bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700"
               }`}
               disabled={loading || ok}
             >
               {loading ? "Submitting..." : "Submit Application"}
             </button>
 
-            <p className="mt-3 text-xs text-gray-500">
+            <p className="mt-3 text-xs text-gray-500 text-center">
               By submitting, you consent to processing your information for this job opportunity.
             </p>
           </form>
@@ -686,3 +745,4 @@ function JobModal({
     </div>
   );
 }
+```eof
